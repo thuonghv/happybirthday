@@ -5,11 +5,11 @@
   const FRAME_RATE = 60
   const PARTICLE_NUM = 2000
   const RADIUS = Math.PI * 2
-  const CANVASWIDTH = 500
-  const CANVASHEIGHT = 150
+  let CANVASWIDTH = window.innerWidth
+  let CANVASHEIGHT = 250
   const CANVASID = 'canvas'
 
-  let texts = ['MY DEAR', 'LOOK UP AT THE', 'STARRY SKY', 'ARE YOU', 'LOOKING AT THE', 'SAME STAR', 'WITH ME ?', 'HAPPY', 'CHINESE', 'VALENTINE\'S', 'DAY', 'I MISS YOU']
+  let texts = ['HI,CẬU CỦA TỚ', 'NẾU ĐÊM NAY CÓ', 'CƠN MƯA SAO BĂNG', 'THÌ TẤT CẢ NHỮNG', 'ĐIỀU TỚ ƯỚC', 'SẼ ĐỀU CÓ CẬU', 'CHÚC THỤC TUỔI MỚI', 'LUÔN TỎA SÁNG ', 'NHƯ NGÀN VÌ SAO', 'TRÊN BẦU TRỜI NÀY', 'MAY MẮN VÀ HẠNH PHÚC', 'HAPPY BIRTHDAY','TỚ THÍCH CẬU ❤️']
 
   let canvas,
     ctx,
@@ -18,14 +18,51 @@
     text = texts[0],
     textIndex = 0,
     textSize = 70
+function calculateFontSize(){
 
+    if(window.innerWidth < 480){
+        textSize = 34
+    }
+    else if(window.innerWidth < 768){
+        textSize = 46
+    }
+    else if(window.innerWidth < 1200){
+        textSize = 60
+    }
+    else{
+        textSize = 80
+    }
+
+}
   function draw () {
     ctx.clearRect(0, 0, CANVASWIDTH, CANVASHEIGHT)
     ctx.fillStyle = 'rgb(255, 255, 255)'
     ctx.textBaseline = 'middle'
     ctx.fontWeight = 'bold'
-    ctx.font = textSize + 'px \'SimHei\', \'Avenir\', \'Helvetica Neue\', \'Arial\', \'sans-serif\''
-    ctx.fillText(text, (CANVASWIDTH - ctx.measureText(text).width) * 0.5, CANVASHEIGHT * 0.5)
+    let dynamicSize =
+    window.innerWidth < 768
+    ? 36
+    : 70
+
+    ctx.font = dynamicSize + "px 'SimHei','Avenir','Helvetica Neue','Arial',sans-serif"
+
+    while(
+        ctx.measureText(text).width > CANVASWIDTH * 0.85 &&
+        dynamicSize > 20
+    ){
+        dynamicSize -= 2
+
+        ctx.font =
+        dynamicSize +
+        "px 'SimHei','Avenir','Helvetica Neue','Arial',sans-serif"
+    }
+    ctx.textAlign = 'center'
+
+    ctx.fillText(
+      text,
+      CANVASWIDTH / 2,
+      CANVASHEIGHT / 2
+)
 
     let imgData = ctx.getImageData(0, 0, CANVASWIDTH, CANVASHEIGHT)
 
@@ -41,7 +78,7 @@
   }
 
   function particleText (imgData) {
-    // 点坐标获取
+    
     var pxls = []
     for (var w = CANVASWIDTH; w > 0; w -= 3) {
       for (var h = 0; h < CANVASHEIGHT; h += 3) {
@@ -105,15 +142,34 @@
   }
 
   function setDimensions () {
+
+    
+
+    if(window.innerWidth < 768){
+        CANVASWIDTH = 420
+        CANVASHEIGHT = 160
+    }else{
+        CANVASWIDTH = 700
+        CANVASHEIGHT = 220
+    }
+
     canvas.width = CANVASWIDTH
     canvas.height = CANVASHEIGHT
+
     canvas.style.position = 'absolute'
-    canvas.style.left = '0%'
-    canvas.style.top = '0%'
-    canvas.style.bottom = '0%'
-    canvas.style.right = '0%'
-    canvas.style.marginTop = window.innerHeight * .15 + 'px'
-  }
+    canvas.style.left = '0'
+    canvas.style.top = '0'
+    canvas.style.right = '0'
+    if(window.innerWidth < 768){
+    canvas.style.marginTop = '15px'
+    }
+    else{
+    canvas.style.marginTop =
+    window.innerHeight * 0.12 + 'px'
+    }
+
+    calculateFontSize()
+}
 
   function event () {
     document.addEventListener('click', function (e) {
@@ -151,29 +207,31 @@
     }
 
     draw()
+    window.addEventListener('resize', () => {
+    setDimensions()
+    })
   }
 
   class Particle {
     constructor (canvas) {
       let spread = canvas.height
       let size = Math.random() * 1.2
-      // 速度
+      
       this.delta = 0.06
-      // 现在的位置
+      
       this.x = 0
       this.y = 0
-      // 上次的位置
+      
       this.px = Math.random() * canvas.width
       this.py = (canvas.height * 0.5) + ((Math.random() - 0.5) * spread)
-      // 记录点最初的位置
+      
       this.mx = this.px
       this.my = this.py
-      // 点的大小
+      
       this.size = size
-      // this.origSize = size
-      // 是否用来显示字
+      
       this.inText = false
-      // 透明度相关
+      
       this.opacity = 0
       this.fadeInRate = 0.005
       this.fadeOutRate = 0.03

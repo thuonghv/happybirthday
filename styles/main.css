@@ -97,5 +97,18 @@ a:hover {
 }
 
 #canvas{
-    margin: 0 auto;
+    position:absolute;
+    left:0;
+    right:0;
+    margin:auto;
+    z-index:10;
+}
+@media (max-width:768px){
+
+   
+
+    #footer{
+        height:220px;
+    }
+
 }
